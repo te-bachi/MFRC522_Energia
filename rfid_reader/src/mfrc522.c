@@ -79,12 +79,14 @@ void Write_MFRC522(uint8_t addr, uint8_t val)
     a = ((addr<<1)&0x7E);
     //UARTprintf("SSI Put: addr = 0x%02x\n", tmp);
     SSIDataPut(SSI1_BASE, a);
+    while(SSIBusy(SSI1_BASE));
     SSIDataGet(SSI1_BASE, &tmp);
     //UARTprintf("SSI Get: tmp = 0x%02x\n", tmp);
 
     w_value = val;
     //UARTprintf("SSI Put: val = 0x%02x\n", val);
     SSIDataPut(SSI1_BASE, w_value);
+    while(SSIBusy(SSI1_BASE));
     SSIDataGet(SSI1_BASE, &r_value);
     //UARTprintf("SSI Get: tmp = 0x%02x\n", tmp);
     //UARTprintf("\n");
@@ -111,12 +113,14 @@ uint8_t Read_MFRC522(uint8_t addr)
     a = (((addr<<1)&0x7E) | 0x80);
     //UARTprintf("SSI Put: addr = 0x%02x\n", tmp);
     SSIDataPut(SSI1_BASE, a);
+    while(SSIBusy(SSI1_BASE));
     SSIDataGet(SSI1_BASE, &tmp);
     //UARTprintf("SSI Get: tmp = 0x%02x\n", tmp);
 
     w_value = 0x00;
     //UARTprintf("SSI Put: val = 0x%02x\n", tmp);
     SSIDataPut(SSI1_BASE, w_value);
+    while(SSIBusy(SSI1_BASE));
     SSIDataGet(SSI1_BASE, &r_value);
     //UARTprintf("SSI Get: tmp = 0x%02x\n", tmp);
     //UARTprintf("\n");
@@ -217,6 +221,8 @@ void MFRC522_Init(void)
     //
     SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI1);
 
+    SSIDisable(SSI1_BASE);
+
     //
     // For this example SSI0 is used with PortA[5:2].  The actual port and pins
     // used may be different on your part, consult the data sheet for more
@@ -259,7 +265,7 @@ void MFRC522_Init(void)
     // the different SPI modes.
     //
     SSIConfigSetExpClk(SSI1_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0,
-                       SSI_MODE_MASTER, 1000000, 8);
+                       SSI_MODE_MASTER, 4000000, 8);
 
     //
     // Enable the SSI0 module.
