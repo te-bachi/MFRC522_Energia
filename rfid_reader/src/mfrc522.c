@@ -1,6 +1,8 @@
 
 #include "mfrc522.h"
 
+#include <stdbool.h>
+
 // #include "inc/hw_ssi.h"
 //#include "inc/hw_memmap.h"
 
@@ -12,6 +14,7 @@
 #include "driverlib/ssi.h"
 #include "driverlib/gpio.h"
 #include "driverlib/sysctl.h"
+#include "driverlib/pin_map.h"
 
 #define NUM_SSI_DATA 3
 
@@ -59,6 +62,9 @@ InitConsole(void)
     // Initialize the UART for console I/O.
     //
     UARTStdioInit(0);
+
+    UARTprintf("Init UART\n");
+
 }
 
 /*
@@ -76,20 +82,24 @@ void Write_MFRC522(uint8_t addr, uint8_t val)
 
     //UARTprintf("=== Write_MFRC522 ===\n");
 
+    GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, (0 << 7));
+
     a = ((addr<<1)&0x7E);
     //UARTprintf("SSI Put: addr = 0x%02x\n", tmp);
-    SSIDataPut(SSI1_BASE, a);
-    while(SSIBusy(SSI1_BASE));
-    SSIDataGet(SSI1_BASE, &tmp);
+    SSIDataPut(SSI0_BASE, a);
+    while(SSIBusy(SSI0_BASE));
+    SSIDataGet(SSI0_BASE, &tmp);
     //UARTprintf("SSI Get: tmp = 0x%02x\n", tmp);
 
     w_value = val;
     //UARTprintf("SSI Put: val = 0x%02x\n", val);
-    SSIDataPut(SSI1_BASE, w_value);
-    while(SSIBusy(SSI1_BASE));
-    SSIDataGet(SSI1_BASE, &r_value);
+    SSIDataPut(SSI0_BASE, w_value);
+    while(SSIBusy(SSI0_BASE));
+    SSIDataGet(SSI0_BASE, &r_value);
     //UARTprintf("SSI Get: tmp = 0x%02x\n", tmp);
     //UARTprintf("\n");
+
+    GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, (1 << 7));
 
     UARTprintf("Write_MFRC522: address = 0x%02x / 0x%02x, w-value = 0x%02x, r-value = 0x%02x\n", addr, a, w_value, r_value);
 }
@@ -110,20 +120,24 @@ uint8_t Read_MFRC522(uint8_t addr)
 
     //UARTprintf("=== Read_MFRC522 ===\n");
 
+    GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, (0 << 7));
+
     a = (((addr<<1)&0x7E) | 0x80);
     //UARTprintf("SSI Put: addr = 0x%02x\n", tmp);
-    SSIDataPut(SSI1_BASE, a);
-    while(SSIBusy(SSI1_BASE));
-    SSIDataGet(SSI1_BASE, &tmp);
+    SSIDataPut(SSI0_BASE, a);
+    while(SSIBusy(SSI0_BASE));
+    SSIDataGet(SSI0_BASE, &tmp);
     //UARTprintf("SSI Get: tmp = 0x%02x\n", tmp);
 
     w_value = 0x00;
     //UARTprintf("SSI Put: val = 0x%02x\n", tmp);
-    SSIDataPut(SSI1_BASE, w_value);
-    while(SSIBusy(SSI1_BASE));
-    SSIDataGet(SSI1_BASE, &r_value);
+    SSIDataPut(SSI0_BASE, w_value);
+    while(SSIBusy(SSI0_BASE));
+    SSIDataGet(SSI0_BASE, &r_value);
     //UARTprintf("SSI Get: tmp = 0x%02x\n", tmp);
     //UARTprintf("\n");
+
+    GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, (1 << 7));
 
     UARTprintf("Read_MFRC522:  address = 0x%02x / 0x%02x, w-value = 0x%02x, r-value = 0x%02x\n", addr, a, w_value, r_value);
 
@@ -219,9 +233,9 @@ void MFRC522_Init(void)
 
     // The SSI0 peripheral must be enabled for use.
     //
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI1);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI0);
 
-    SSIDisable(SSI1_BASE);
+    //SSIDisable(SSI0_BASE);
 
     //
     // For this example SSI0 is used with PortA[5:2].  The actual port and pins
@@ -229,17 +243,17 @@ void MFRC522_Init(void)
     // information.  GPIO port A needs to be enabled so these pins can be used.
     // TODO: change this to whichever GPIO port you are using.
     //
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
 
     //
     // Configure the pin muxing for SSI0 functions on port A2, A3, A4, and A5.
     // This step is not necessary if your part does not support pin muxing.
     // TODO: change this to select the port/pin you are using.
     //
-    GPIOPinConfigure(GPIO_PD0_SSI1CLK);
-    GPIOPinConfigure(GPIO_PD1_SSI1FSS);
-    GPIOPinConfigure(GPIO_PD2_SSI1RX);
-    GPIOPinConfigure(GPIO_PD3_SSI1TX);
+    GPIOPinConfigure(GPIO_PA2_SSI0CLK);
+    GPIOPinConfigure(GPIO_PA3_SSI0FSS);
+    GPIOPinConfigure(GPIO_PA4_SSI0RX);
+    GPIOPinConfigure(GPIO_PA5_SSI0TX);
 
     //
     // Configure the GPIO settings for the SSI pins.  This function also gives
@@ -252,8 +266,11 @@ void MFRC522_Init(void)
     //      PA2 - SSI0CLK
     // TODO: change this to select the port/pin you are using.
     //
-    GPIOPinTypeSSI(GPIO_PORTD_BASE, GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 |
-                   GPIO_PIN_3);
+    GPIOPinTypeSSI(GPIO_PORTA_BASE, GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 |
+                   GPIO_PIN_5);
+
+    // set LED pins as outputs
+    GPIOPinTypeGPIOOutput(GPIO_PORTA_BASE, GPIO_PIN_7);
 
     //
     // Configure and enable the SSI port for SPI master mode.  Use SSI0,
@@ -264,13 +281,13 @@ void MFRC522_Init(void)
     // capture data on.  Please reference the datasheet for more information on
     // the different SPI modes.
     //
-    SSIConfigSetExpClk(SSI1_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0,
+    SSIConfigSetExpClk(SSI0_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0,
                        SSI_MODE_MASTER, 4000000, 8);
 
     //
     // Enable the SSI0 module.
     //
-    SSIEnable(SSI1_BASE);
+    SSIEnable(SSI0_BASE);
 
     //
     // Read any residual data from the SSI port.  This makes sure the receive
@@ -281,7 +298,7 @@ void MFRC522_Init(void)
     // The "non-blocking" function checks if there is any data in the receive
     // FIFO and does not "hang" if there isn't.
     //
-    while(SSIDataGetNonBlocking(SSI1_BASE, &ulDataRx[0]))
+    while(SSIDataGetNonBlocking(SSI0_BASE, &ulDataRx[0]))
     {
     }
 

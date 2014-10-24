@@ -22,7 +22,13 @@
 //
 //*****************************************************************************
 
+#include "uartstdio.h"
+
+#include <stdio.h>
 #include <stdarg.h>
+#include <stdint.h>
+#include <stdbool.h>
+
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"

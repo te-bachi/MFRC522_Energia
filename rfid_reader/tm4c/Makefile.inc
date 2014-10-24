@@ -18,9 +18,12 @@ LIB_GCC_PATH        = ${shell ${CC} ${CFLAGS} -print-libgcc-file-name}
 LIBC_PATH           = ${shell ${CC} ${CFLAGS} -print-file-name=libc.a}
 LIBM_PATH           = ${shell ${CC} ${CFLAGS} -print-file-name=libm.a}
 
-global_CFLAGS      += -DPART_$(PART) -D$(ROM) -I$(STELLARISWARE)
-global_LDFLAGS     += ${STELLARISWARE}/driverlib/gcc-cm4f/libdriver-cm4f.a \
+global_CFLAGS      += -DPART_$(PART) -D$(ROM) -I$(TIVAWARE)
+global_LDFLAGS     += ${TIVAWARE}/driverlib/gcc/libdriver.a \
                       $(LIBM_PATH) $(LIBC_PATH) $(LIB_GCC_PATH)
+
+OBJ_DIRECTORY       = obj
+SRC_DIRECTORY       = ../src
 
 ELF_SUFFIX          = .elf
 HEX_SUFFIX          = .hex
@@ -84,7 +87,7 @@ define OBJECT_template
 
 obj/$(1)/$(2)/$($(4):%.c=%.o): obj/$(1)/$(2)/$(dir $($(4))) $(3)/$($(4))
 	@echo "[CC   ] $(3)/$($(4))"
-	@$(CC) $(ARCH) -o $$@ -c $(3)/$($(4)) $(global_CFLAGS) $($(5)) $($(2)_CFLAGS)
+	$(CC) $(ARCH) -o $$@ -c $(3)/$($(4)) $(global_CFLAGS) $($(5)) $($(2)_CFLAGS)
 
 endef
 
@@ -97,13 +100,13 @@ endef
 
 define PROGRAM_template
 
-$(foreach source,$($(2)_SOURCE),$(eval $(call OBJECT_template,$(1),$(2),src,source,$(4))))
+$(foreach source,$($(2)_SOURCE),$(eval $(call OBJECT_template,$(1),$(2),$(SRC_DIRECTORY),source,$(4))))
 
 $(3)/$(1)/$(2)$(ELF_SUFFIX): $($(1)_$(2)_OBJECT)
 	@mkdir -p $(3)/$(1)
 	
 	@echo "[LD   ] $(3)/$(1)/$(2)$(ELF_SUFFIX)"
-	@$(LD) -T $($(2)_LDSCRIPT) -o $(3)/$(1)/$(2)$(ELF_SUFFIX) $($(1)_$(2)_OBJECT) $(global_LDFLAGS) $($(5)) $($(2)_LDFLAGS)
+	$(LD) -T $($(2)_LDSCRIPT) -o $(3)/$(1)/$(2)$(ELF_SUFFIX) $($(1)_$(2)_OBJECT) $(global_LDFLAGS) $($(5)) $($(2)_LDFLAGS)
 	
 	@echo "[HEX  ] $(3)/$(1)/$(2)$(HEX_SUFFIX)"
 	@$(OBJCOPY) $(OBJCOPY_HEX_FLAGS) $(3)/$(1)/$(2)$(ELF_SUFFIX) $(3)/$(1)/$(2)$(HEX_SUFFIX)

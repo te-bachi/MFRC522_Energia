@@ -30,6 +30,7 @@
 * Description:	Main sample file.
 */
 
+#include <stdbool.h>
 #include <string.h>
 
 #include "mfrc522.h"
@@ -65,6 +66,9 @@ uint8_t NDEFKeyA[16] =    { 0xD3, 0xF7, 0xD3, 0xF7, 0xD3, 0xF7 };
 int main(void) {
     SysCtlClockSet(SYSCTL_SYSDIV_2_5|SYSCTL_USE_PLL|SYSCTL_OSC_MAIN|SYSCTL_XTAL_16MHZ);
 
+    SysCtlDelay(5000);
+
+
     MFRC522_Init();
 //    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER1);
 //    TimerConfigure(TIMER1_BASE, TIMER_CFG_SPLIT_PAIR | TIMER_CFG_A_PERIODIC);
@@ -79,8 +83,21 @@ int main(void) {
     uint8_t version = Read_MFRC522(VersionReg);
     UARTprintf("MFRC522 Version: 0x%02x\n", version);
 
-    while (0) {
-        //
+    if (0) {
+        // Enable PORT F GPIO
+        SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+
+        // set LED pins as outputs
+        GPIOPinTypeGPIOOutput(GPIO_PORTC_BASE, GPIO_PIN_5);
+
+        // loop forever
+        int k;
+        for (int i = 0; true; i++) {
+            k = i % 2;
+            GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_5, (k << 5));
+            SysCtlDelay(5000);
+        }
+
     }
 
     while(1) {

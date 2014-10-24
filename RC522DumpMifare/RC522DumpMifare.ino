@@ -454,7 +454,7 @@ void MFRC522_Reset(void)
 void MFRC522_Init(void)
 {
   
-   Serial.println("=== MFRC522_Init BEGIN ===");
+   //Serial.println("=== MFRC522_Init BEGIN ===");
    digitalWrite(NRSTPD,HIGH);
 
    MFRC522_Reset();
@@ -473,7 +473,7 @@ void MFRC522_Init(void)
     //Write_MFRC522(RFCfgReg, 0x7F);   		//RxGain = 48dB
 
     AntennaOn();		//turn on antenna
-   Serial.println("=== MFRC522_Init END ===");
+   //Serial.println("=== MFRC522_Init END ===");
 }
 
 
