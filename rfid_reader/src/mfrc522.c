@@ -101,7 +101,7 @@ void Write_MFRC522(uint8_t addr, uint8_t val)
 
     GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, (1 << 7));
 
-    UARTprintf("Write_MFRC522: address = 0x%02x / 0x%02x, w-value = 0x%02x, r-value = 0x%02x\n", addr, a, w_value, r_value);
+    //UARTprintf("Write_MFRC522: address = 0x%02x / 0x%02x, w-value = 0x%02x, r-value = 0x%02x\n", addr, a, w_value, r_value);
 }
 
 
@@ -139,7 +139,7 @@ uint8_t Read_MFRC522(uint8_t addr)
 
     GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, (1 << 7));
 
-    UARTprintf("Read_MFRC522:  address = 0x%02x / 0x%02x, w-value = 0x%02x, r-value = 0x%02x\n", addr, a, w_value, r_value);
+    //UARTprintf("Read_MFRC522:  address = 0x%02x / 0x%02x, w-value = 0x%02x, r-value = 0x%02x\n", addr, a, w_value, r_value);
 
     return r_value;
 }
@@ -225,7 +225,7 @@ void MFRC522_Init(void)
 
     InitConsole();
 
-    UARTprintf("=== MFRC522_Init BEGIN ===\n");
+    //UARTprintf("=== MFRC522_Init BEGIN ===\n");
 
     //UARTprintf("SSI ->\n");
     //UARTprintf("  Mode: SPI\n");
@@ -319,7 +319,7 @@ void MFRC522_Init(void)
 
     AntennaOn();        //turn on antenna
 
-    UARTprintf("=== MFRC522_Init END ===\n");
+    //UARTprintf("=== MFRC522_Init END ===\n");
 }
 
 

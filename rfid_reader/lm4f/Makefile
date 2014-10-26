@@ -7,7 +7,7 @@ STELLARISWARE               = /home/andreas/src/stellaris
 global_CFLAGS               = -I../include -pipe -std=gnu99 \
                               -ffunction-sections -fdata-sections -fms-extensions \
                               -Wall -Wmissing-prototypes -Wno-uninitialized -Wstrict-prototypes
-global_LDFLAGS              = --gc-sections 
+global_LDFLAGS              = -ggdb -Wl,--gc-sections -static
 
 debug_CFLAGS                = -O0 -ggdb
 debug_LDFLAGS               = 
