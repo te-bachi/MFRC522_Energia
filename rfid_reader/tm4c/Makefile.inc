@@ -3,7 +3,7 @@
 # FPU = fpv4-sp-d16 (ARMv7-M Floating-Point Extension v4, Single-Precision Floating-Point Arithmetic, 16 register)
 CPU                 = cortex-m4
 FPU                 = fpv4-sp-d16
-FLOAT_ABI           = softfp
+FLOAT_ABI           = hard
 CODE_GEN            = thumb
 
 COMPILER_PREFIX     = arm-none-eabi
@@ -14,9 +14,9 @@ OBJDUMP             = ${COMPILER_PREFIX}-objdump
 BUILD               = debug release
 ARCH                = -m$(CODE_GEN) -mcpu=$(CPU) -mfpu=$(FPU) -mfloat-abi=$(FLOAT_ABI)
 
-LIB_GCC_PATH        = ${shell ${CC} ${CFLAGS} -print-libgcc-file-name}
-LIBC_PATH           = ${shell ${CC} ${CFLAGS} -print-file-name=libc.a}
-LIBM_PATH           = ${shell ${CC} ${CFLAGS} -print-file-name=libm.a}
+LIB_GCC_PATH        = ${shell ${CC} ${ARCH} ${CFLAGS} -print-libgcc-file-name}
+LIBC_PATH           = ${shell ${CC} ${ARCH} ${CFLAGS} -print-file-name=libc.a}
+LIBM_PATH           = ${shell ${CC} ${ARCH} ${CFLAGS} -print-file-name=libm.a}
 
 global_CFLAGS      += -DPART_$(PART) -D$(ROM) -I$(TIVAWARE)
 global_LDFLAGS     += ${TIVAWARE}/driverlib/gcc/libdriver.a \
